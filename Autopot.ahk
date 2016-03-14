@@ -1,31 +1,34 @@
-;██████╗ ██╗   ██╗     ██████╗ ██╗   ██╗██████╗ ██╗   ██╗██████╗ 
-;██╔══██╗╚██╗ ██╔╝    ██╔════╝ ██║   ██║██╔══██╗██║   ██║██╔══██╗
-;██████╔╝ ╚████╔╝     ██║  ███╗██║   ██║██████╔╝██║   ██║██║  ██║
-;██╔══██╗  ╚██╔╝      ██║   ██║██║   ██║██╔══██╗██║   ██║██║  ██║
-;██████╔╝   ██║       ╚██████╔╝╚██████╔╝██║  ██║╚██████╔╝██████╔╝
-;╚═════╝    ╚═╝        ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
-                                                                
-;-------GUI-----------------GUI-----------------GUI-----------------GUI-----------------GUI----------
-
 #SingleInstance force
+
+SetWorkingDir %A_ScriptDir%
+
+IfNotExist, cports.exe
+{
+	MsgBox, WARNING: You do not have cports.exe, please download it from the website that will be copied into your clipboard if you want to use the auto quit to login screen function.`n`n When you press OK the site will be copied to your clipboard.
+	clipboard = http://www.nirsoft.net/utils/cports.html#DownloadLinks
+}
 
 IniRead, LastTab, Config.ini, Config, LastTab, Settings
 
 If LastTab = AutoFlask
 {
-   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask||AutoQuit|Others|Settings|
+   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask||Defense|AutoQuit|Others|Settings|
+}
+Else If LastTab = Defense
+{
+   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|Defense||AutoQuit|Others|Settings|
 }
 Else If LastTab = AutoQuit
 {
-   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|AutoQuit||Others|Settings|
+   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|Defense|AutoQuit||Others|Settings|
 }
 Else If LastTab = Others
 {
-   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|AutoQuit|Others||Settings|
+   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|Defense|AutoQuit|Others||Settings|
 }
 Else If LastTab = Settings
 {
-   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|AutoQuit|Others|Settings||
+   Gui,Add,Tab2, x0 y0 w474 h595 gTabFunc vTabChoice,AutoFlask|Defense|AutoQuit|Others|Settings||
 }
 
 Gui, Tab, Settings
@@ -73,11 +76,11 @@ Loop, 5
 		IniRead, minManaToDrinkPot , Config.ini, Config%A_Index%, minManaToDrinkPot, 15
 		IniRead, minLifePercentToSpam, Config.ini, Config%A_Index%, minLifePercentToSpam, 35
 		IniRead, ResyncSpam, Config.ini, Config%A_Index%, ResyncSpam, 0
-      IniRead, RemainingSpam, Config.ini, Config%A_Index%, RemainingSpam, 0
+		IniRead, RemainingSpam, Config.ini, Config%A_Index%, RemainingSpam, 0
 		IniRead, InstantFlaskDelay, Config.ini, Config%A_Index%, InstantFlaskDelay, 0
 		IniRead, QuickSilverMovementTimer , Config.ini, Config%A_Index%, QuickSilverMovementTimer, 15
 		IniRead, RemoveAilmentsTimer , Config.ini, Config%A_Index%, RemoveAilmentsTimer, 10
-      IniRead, RemoveCorruptedBloodCharges , Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges, 10
+		IniRead, RemoveCorruptedBloodCharges , Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges, 10
 	}	
 }
 
@@ -157,7 +160,7 @@ Gui, Add, Text, x192 y480 w22 h30 vRemoveAilmentsTimerUpdate, % Round(RemoveAilm
 Gui, Add, Text, x214 y480 w10 h30 , s
 
 Gui, Add, GroupBox, x12 y530 w220 h60 , Only Remove Corrupted Blood If X Charges
-Gui, Add, Slider, x22 y550 w170 h30 Range1-20 gGuiUpdate vRemoveCorruptedBloodCharges +ToolTip, %RemoveCorruptedBloodCharges%
+Gui, Add, Slider, x22 y550 w170 h30 Range1-20 gGuiUpdate vRemoveCorruptedBloodCharges +ToolTip TickInterval5, %RemoveCorruptedBloodCharges%
 Gui, Add, Text, x192 y550 w12 h30 vRemoveCorruptedBloodChargesUpdate, %RemoveCorruptedBloodCharges%
 Gui, Add, Text, x210 y550 w20 h30 , ch
 
@@ -237,6 +240,20 @@ If FlaskOnCorruptedBloodCheck = 1
    Gui, Add, CheckBox, x242 y558 w220 h30  vFlaskOnCorruptedBloodCheckBox gFlaskOnCorruptedBloodCheck Checked, Use Flask to Remove Corrupted Blood
 }
 
+Gui, Tab, Defense
+
+Gui, Add, GroupBox, x12 y40 w220 h60 , Disable Manual Defense Flask on Slot
+
+Loop, 5
+{
+	IniRead, Slot%A_Index%Disabled2, Config.ini, Disable2Slot, Disable2Slot%A_Index%, 0
+	XSlot:=((A_Index*40)-18)
+	X=x%XSlot%
+	If (Slot%A_Index%Disabled2 = 0)
+	Gui, Add, CheckBox, %X% y60 w30 h30 vDisable2Slot%A_Index% gDisable2Slot, %A_Index%
+	Else If (Slot%A_Index%Disabled2 = 1)
+	Gui, Add, CheckBox, %X% y60 w30 h30 checked vDisable2Slot%A_Index% gDisable2Slot, %A_Index%
+}
 
 Gui, Tab, AutoQuit
 
@@ -244,22 +261,22 @@ Gui, Add, GroupBox, x12 y180 w220 h60, Auto Quit Method
 IniRead, AutoQuitMethod , Config.ini, Config, AutoQuitMethod, 1
 If AutoQuitMethod = 1
 {
-   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen (Using cports)||Exit to Login Screen (Writes to Memory)|Alt+F4 (Fastest according to Chris)|Disabled
+   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen||Alt+F4 (Fastest according to Chris)|Use a Portal (On Testing)|Disabled
    autoQuitMode:=1
 }
 Else If AutoQuitMethod = 2
 {
-   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen (Using cports)|Exit to Login Screen (Writes to Memory)||Alt+F4 (Fastest according to Chris)|Disabled
+   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen|Alt+F4 (Fastest according to Chris)||Use a Portal (On Testing)|Disabled
    autoQuitMode:=0
 }
 Else If AutoQuitMethod = 3
 {
-   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen (Using cports)|Exit to Login Screen (Writes to Memory)|Alt+F4 (Fastest according to Chris)||Disabled
+   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen|Alt+F4 (Fastest according to Chris)|Use a Portal (On Testing)||Disabled
    autoQuitMode:=3
 }
 Else If AutoQuitMethod = 4
 {
-   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen (Using cports)|Exit to Login Screen (Writes to Memory)|Alt+F4 (Fastest according to Chris)|Disabled||
+   Gui, Add, DropDownList, x22 y200 w200 h21 AltSubmit gAutoQuitList vAutoQuitChoice R5, Exit to Login Screen|Alt+F4 (Fastest according to Chris)|Use a Portal (On Testing)|Disabled||
    autoQuitMode:=4
 }
 
@@ -387,10 +404,7 @@ If HoldCtrlCheck = 1
 Gui, Tab
 
 Gui, Add, Button, x22 y609 w130 h40 gDefault, Reset Profile
-Gui, Add, Button, x182 y609 w120 h40 gReadMe, ReadMe
-Gui, Add, Button, x332 y609 w120 h40 gDonate, Donate
-
-Gui, Add, Text, x380 y1 w110 h18 vguicontroled, Created by Gurud.
+Gui, Add, Button, x182 y609 w120 h40 gReadMe, ReadMe/Credits
 
 Gui, Add, GroupBox, x0 y590 w472 h74 ,
 Gui, Add, GroupBox, x1 y591 w470 h72 ,
@@ -492,6 +506,15 @@ StringTrimRight, Name, A_ScriptName, 4
 
 Gui, Show, x760 y198 h665 w474, %Name%
 
+;AutoDefense Overlay
+Gui, 5:+ToolWindow
+Gui, 5:Font, s8 cRed
+Gui, 5:Margin, 0, 0
+Gui, 5:Add, Text, x3 y2 vAPMode, Defense Mode: Automatic
+Gui, 5:Show, x0 y0 w125 h15, AutoDefenseGUI
+Gui, 5:-Caption +AlwaysOnTop +Disabled +E0x20 +LastFound
+Winset,TransColor, 0xFFFFFF
+GuiControl,5:, APMode, Defense Mode: Manual
 ;---------------------START DYNAMIC HOTKEYS---------------------
 
 ;"Wild Mode allows hotkeys to trigger when other modIfiers are also held.`nFor example, If you bound Ctrl+C to an action...`nWild Mode ON: Ctrl+Alt+C, Ctrl+ShIft+C etc would still trigger the action`nWild Mode OFF: Ctrl+Alt+C etc would not trigger the action."
@@ -529,10 +552,10 @@ DefaultHKObject := {hk: "", type: "", wild: ""}
 ; Misc vars
 ININame := "Config.ini"
 HotkeyList := []
-NumHotkeys := 9
+NumHotkeys := 12
 
 ; Create the GUI
-Gui 2:Add, Text,, This allows you to change Hotkeys.`n Click the "ReadMe" button to know what the hotkeys do.
+Gui 2:Add, Text,, This allows you to change Hotkeys.`n Click the "ReadMe/Credits" for extended information.
 Gui, 2:Add, Text, x357 y25 w30 center, Wild`nMode
 
 ypos := 50
@@ -542,13 +565,24 @@ ypos := 50
 
 Loop % NumHotkeys 
 {
-   Gui, 2:Add, Edit, Disabled vHotkeyName%A_Index% w260 x5 y%ypos%, None
+   Gui, 2:Add, Edit, Disabled vHotkeyName%A_Index% w185 x5 y%ypos%, None
    Gui, 2:Add, Button, gBind vBind%A_Index% yp-1 xp+270, Set Hotkey
    Gui, 2:Add, Checkbox, vWild%A_Index% gOptionChanged xp+90 yp+5
    ;Gui, 2:Add, Checkbox, vBlock%A_Index% gOptionChanged xp+30 yp
    ypos += 25
 }
-
+Gui, 2:Add, Text, w80 x195 y55, Resync
+Gui, 2:Add, Text, w80 x195 y80, Remaining
+Gui, 2:Add, Text, w80 x195 y105, DPSCalc
+Gui, 2:Add, Text, w80 x195 y130, More Info
+Gui, 2:Add, Text, w80 x195 y155, Logout
+Gui, 2:Add, Text, w80 x195 y180, Test Portal
+Gui, 2:Add, Text, w80 x195 y205, Trade Spam
+Gui, 2:Add, Text, w80 x195 y230, Borderless
+Gui, 2:Add, Text, w80 x195 y255, Hideout
+Gui, 2:Add, Text, w80 x195 y280, Manual Defense
+Gui, 2:Add, Text, w80 x195 y305, Defense Toggle
+Gui, 2:Add, Text, w80 x195 y330, Overlay Toggle
 
 ; Set GUI State
 LoadSettings()
@@ -780,6 +814,16 @@ WindowBasicsCache:=[] ; keyed by "%hwnd%%CurrPid%", entries are objects with pro
 
 OnExit, ExitSub
 
+;-----Added Inits-----
+toggle := 0
+mtoggle := -1
+APMode := N/A
+toggleOverlay := 0
+overlayTimer := 0
+baseOverlayTimer := sleepTimer
+
+;-----End Added Inits-----
+
 Loop
 {
    Main()
@@ -885,7 +929,7 @@ GetFrameBase(hwnd)
 		GetWindowBasics(hwnd, mBase, pH, mSize)
 
 
-      If baseMgrPtr= 0
+      If !baseMgrPtr
       {
          ScanBaseMgrPtr(mBase, pH, mSize)
       }
@@ -1080,9 +1124,9 @@ ReadPlayerStats(hwnd, byRef PlayerStats)
    PlayerStats.PanelSkillTree:=ReadMemUInt(pH,PanelSkillTreeOffset+0x7d4)
    PanelWaypointOffset:=ReadMemUInt(pH,CheckBase+Offset8+0x28)
    PlayerStats.PanelWaypoint:=ReadMemUInt(pH,PanelWaypointOffset+0x7d4)
-   MouseOnEnemyOffset:=ReadMemUInt(pH,CheckBase+Offset8+0xb8)
+   MouseOnEnemyOffset:=ReadMemUInt(pH,CheckBase+Offset8+0xb4)
    PlayerStats.MouseOnEnemyStatus:=ReadMemUInt(pH,MouseOnEnemyOffset+0x7d4)
-   PanelInstanceManagerOffset:=ReadMemUInt(pH,CheckBase+Offset8+0xD4)  ;added by immor
+   PanelInstanceManagerOffset:=ReadMemUInt(pH,CheckBase+Offset8+0xD0)  ;added by immor
    PlayerStats.PanelInstanceManager:=ReadMemUInt(pH,PanelInstanceManagerOffset+0x7d4) ;added by immor
    InCityOffset:=GetMultilevelPointer(pH,[CheckBase+Offset10,0x708,0x284])
    PlayerStats.InCity:=ReadMemUInt(pH,InCityOffset+0x7d4)
@@ -1279,7 +1323,7 @@ ReadFlasksData(hwnd, byRef FlasksData)
 IsInGame(hwnd)
 {
 	global Steam
-   global Offset3
+	global Offset3
 
    If (hwnd=0 || hwnd="")
       return false
@@ -1572,7 +1616,6 @@ FileMD5( sFile="", cSz=4 )
 	Return MD5, DllCall( "FreeLibrary", UInt,hMod )
 }
 
-
 Main()
 {
 	global AutoFlaskWatchdogPeriod
@@ -1585,14 +1628,16 @@ Main()
 	global trayNotIfications
 	global autoQuitMode
 	global desync
+	global DefenseSpam
+	global AutoDefense
 	global remaining
-   global hideout
+	global hideout
 	global tradechat
 	global borderless
 	global ResyncTimer
 	global ResyncSpam
-   global RemainingTimer
-   global RemainingSpam
+	global RemainingTimer
+	global RemainingSpam
 	global tradechat
 	global TradeSpam
 	global TradeSpamTimer
@@ -1623,16 +1668,24 @@ Main()
 	global FlaskOnShockedCheck
 	global FlaskOnIgnitedCheck
 	global QuicksilverBuff
-   global FlaskOnCurseCheck
-   global FlaskOnCorruptedBloodCheck
-   global HoldCtrlCheck
-   global CtrlkeyDown
-   global AttackInPlaceKeyDown
-   global Taiwan
-   global Singapore
-   global ClientServerMode
-   global ConfigPath
-
+	global FlaskOnCurseCheck
+	global FlaskOnCorruptedBloodCheck
+	global HoldCtrlCheck
+	global CtrlkeyDown
+	global AttackInPlaceKeyDown
+	global Taiwan
+	global Singapore
+	global ClientServerMode
+	global ConfigPath
+	global overlayTimer
+	global baseOverlayTimer
+	global toggle
+	global toggleOverlay
+	global mtoggle
+	global APMode
+	global xOffset
+	global yOffset
+	
 	WinGet, WinID, List, %cliname%
 
 	Loop, %WinID%
@@ -1746,7 +1799,7 @@ Main()
             }
             ;FlaskHotkey%A_Index%={vk%vk%
          ;}
-         
+		 
          20secsTimer:=A_TickCount
       }
 
@@ -1809,7 +1862,13 @@ Main()
 		{
 			If (autoQuitMode=0)
 			{
-				QuitToLoginScreen(WinID%A_Index%)
+            WinActivate Path of Exile ahk_class Direct3DWindowClass
+				IfWinActive Path of Exile ahk_class Direct3DWindowClass
+            {
+               SendInput {ALT Down}
+               SendInput {F4}
+               SendInput {ALT Up}
+            }
 				continue
 			}
 			Else If (autoQuitMode=1)
@@ -1819,13 +1878,7 @@ Main()
 			}
 			Else If (autoQuitMode=3)
 			{
-            WinActivate Path of Exile ahk_class Direct3DWindowClass
-				IfWinActive Path of Exile ahk_class Direct3DWindowClass
-            {
-               SendInput {ALT Down}
-               SendInput {F4}
-               SendInput {ALT Up}
-            }
+				UsePortal()
 				continue
 			}
 			Else If (autoQuitMode=4)
@@ -1885,6 +1938,7 @@ Main()
 		QuicksilverBuff:=0
 
 		RemAilmentsTimer:=Round(CurrentConfig.RemAilmentsTimer/10,1)
+		RemCorruptedBloodCharges:=CurrentConfig.RemCorruptedBloodCharges
 
       LeavingArea:=0
       GracePeriod:=0
@@ -2029,9 +2083,9 @@ Main()
 				continue
 			}
 
-         Else If (((InStr(playerstats.BuffName[A_Index], "curse")) || InStr(playerstats.BuffName[A_Index], "冰凍")) And !(InStr(playerstats.BuffName[A_Index], "flask")) And !(PlayerStats.BuffTimer[A_Index]="1.#INF00"))
+         Else If (((InStr(playerstats.BuffName[A_Index], "curse")) || InStr(playerstats.BuffName[A_Index], "冰凍")) And !(InStr(playerstats.BuffName[A_Index], "flask")))
          {
-            If (FlaskOnCurseCheck)
+            If (FlaskOnCurseCheck) && (BuffTimer!="1.#INF00")
             {
                If ((!WindowQueuedFlaskEffects[k].HasKey("CurseQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].CurseQueueEndtime-lagCompensation)))
                {
@@ -2070,9 +2124,8 @@ Main()
 
          Else If (InStr(playerstats.BuffName[A_Index], "corrupted_blood") || InStr(playerstats.BuffName[A_Index], "腐化之血"))
          {
-            global RemoveCorruptedBloodCharges
             BuffCharges:=PlayerStats.BuffCharges[A_Index]
-            If ((FlaskOnCorruptedBloodCheck) && (BuffCharges>=RemoveCorruptedBloodCharges))
+			If ((FlaskOnCorruptedBloodCheck) && (BuffCharges>=RemCorruptedBloodCharges))
             {
                If ((!WindowQueuedFlaskEffects[k].HasKey("CorruptedBloodQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].CorruptedBloodQueueEndtime-lagCompensation)))
                {
@@ -2109,44 +2162,6 @@ Main()
             continue
          }
 
-         Else If InStr(playerstats.BuffName[A_Index], "puncture")
-         {
-            If ((FlaskOnCorruptedBloodCheck))
-            {
-               If ((!WindowQueuedFlaskEffects[k].HasKey("CorruptedBloodQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].CorruptedBloodQueueEndtime-lagCompensation)))
-               {
-                  If Taiwan
-                  {
-                     flaskNum:=GetMaxChargesFlaskOfMod(FlasksData,"止血之")
-                  }
-                  else
-                  {
-                     flaskNum:=GetMaxChargesFlaskOfMod(FlasksData,"of Staunching")
-                  }
-
-                  If (flaskNum!="")
-                  {  
-                     WindowQueuedFlaskEffects[k].CorruptedBloodQueueEndtime:=A_TickCount+300
-                     
-                     If (trayNotIfications)
-                     {
-                        TrayTip, PoE AutoFlask Using "of Staunching" flask %flaskNum%, %A_Space% , 2
-                     }
-                     hKey:=FlaskHotkey%flaskNum%
-                     IfWinActive Path of Exile ahk_class Direct3DWindowClass
-                     {
-                        Sendinput, %hkey% Down}
-                        Sendinput, %hkey% Up}
-                     } 
-                     Else
-                     {
-                        ControlSend,,%hkey% Down %hkey% Up}, % "ahk_id" hwnd
-                     }
-                  }
-               }
-            }
-            continue
-         }
          /* Lag dependent?
          Else If InStr(playerstats.BuffName[A_Index], "flask_effect_Life")
          {
@@ -2203,6 +2218,8 @@ Main()
 
       If (!GracePeriod && !LeavingArea)
       {
+	   If (PlayerStats.ChatStatus!="" && PlayerStats.ChatStatus=65536)
+	   {
          If (currLifeRatio<CurrentConfig.minLifeRatioToInstant)
          {
             If ((!WindowQueuedFlaskEffects[k].HasKey("InstantQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].InstantQueueEndtime)))
@@ -2314,7 +2331,7 @@ Main()
       		}
       	}
 
-      	If (currLifeRatio<CurrentConfig.minLifeRatioToPopJade || currEShieldRatio<CurrentConfig.minEShieldRatioToPopJade)
+      	If (currLifeRatio<CurrentConfig.minLifeRatioToPopJade || currEShieldRatio<CurrentConfig.minEShieldRatioToPopJade || mtoggle=0 && PlayerStats.InCity!="" && PlayerStats.InCity=65537)
       	{
       		If ((!WindowQueuedFlaskEffects[k].HasKey("jadeQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].jadeQueueEndtime-lagCompensation)))
       		{
@@ -2364,9 +2381,33 @@ Main()
       				break
       			}
       		}
+			If ((!WindowQueuedFlaskEffects[k].HasKey("BasaltQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].BasaltQueueEndtime-lagCompensation)))
+      		{
+      			flaskNum:=GetMaxChargesFlaskOfType(FlasksData,"FlaskUtility1") ; Basalt flask
+      			If (flaskNum!="")
+      			{
+      				EffectDuration:=FlasksData[flaskNum].EffectDuration
+      				WindowQueuedFlaskEffects[k].BasaltQueueEndtime:=A_TickCount+EffectDuration*100
+      				If (trayNotIfications)
+      				{
+      					TrayTip, PoE AutoFlask Using Topaz Flask %flaskNum%, %A_Space% , 2
+      				}
+      				hKey:=FlaskHotkey%flaskNum%
+      				IfWinActive Path of Exile ahk_class Direct3DWindowClass
+                  {
+                     Sendinput, %hkey% Down}
+                     Sendinput, %hkey% Up}
+                  } 
+                  Else
+                  {
+                     ControlSend,,%hkey% Down %hkey% Up}, % "ahk_id" hwnd
+                  }
+      				break
+      			}
+      		}
       	}
 
-      	If (currLifeRatio<CurrentConfig.minLifeRatioToPopElementalResist || currEShieldRatio<CurrentConfig.minEShieldRatioToPopElementalResist)
+      	If (currLifeRatio<CurrentConfig.minLifeRatioToPopElementalResist || currEShieldRatio<CurrentConfig.minEShieldRatioToPopElementalResist  || mtoggle=0 && PlayerStats.InCity!="" && PlayerStats.InCity=65537)
       	{
       		If ((!WindowQueuedFlaskEffects[k].HasKey("RubyQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].RubyQueueEndtime-lagCompensation)))
       		{
@@ -2549,6 +2590,7 @@ Main()
       			}
       		}
       	}
+	   }
       }
 
 		If (PlayerStats.PlayerActionID!="" && PlayerStats.PlayerActionID!=128 && PlayerStats.PlayerActionID!=90)
@@ -2567,7 +2609,7 @@ Main()
 					{
 						If (PlayerStats.PlayerActionID!="" && (PlayerStats.PlayerActionID=128 || PlayerStats.PlayerActionID=90))
 						{
-							If (A_TickCount>=MovementTimer+CurrentConfig.QuickSilverTimer)
+							If (A_TickCount>=MovementTimer+CurrentConfig.QuickSilverTimer || mtoggle=0 && PlayerStats.InCity!="" && PlayerStats.InCity=65537)
 							{
 								If ((!WindowQueuedFlaskEffects[k].HasKey("QuickQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].QuickQueueEndtime-lagCompensation)))
 								{
@@ -2610,7 +2652,7 @@ Main()
 					{
 						If (PlayerStats.PlayerActionID!="" && (PlayerStats.PlayerActionID=128 || PlayerStats.PlayerActionID=90))
 						{
-							If (A_TickCount>=MovementTimer+CurrentConfig.QuickSilverTimer)
+							If (A_TickCount>=MovementTimer+CurrentConfig.QuickSilverTimer || mtoggle=0 && PlayerStats.InCity!="" && PlayerStats.InCity=65537)
 							{
 								If ((!WindowQueuedFlaskEffects[k].HasKey("QuickQueueEndtime")) || (A_TickCount>=(WindowQueuedFlaskEffects[k].QuickQueueEndtime-lagCompensation)))
 								{
@@ -2789,16 +2831,13 @@ Main()
             }
          }
       }
-
-
       
    ;If (PlayerStats.PlayerActionID!="" && PlayerStats.PlayerActionID=2176)  ;2048 not
    ;If ((autoQuit=1) && (ThisID!="") && (ThisID!=WinActive("A")))
    ;WinActivate, % "ahk_id" ThisID
       
       ++PanickedTimer  ;TODO better way
-
-
+	  
       If desync = 1
       {
          If (PlayerStats.ChatStatus!="" && PlayerStats.ChatStatus=65536)
@@ -3083,6 +3122,154 @@ Main()
             RemainingTimer:= A_TickCount
          }
       }
+	  
+;-------ADDED FUNCTIONS---------------------------ADDED FUNCTIONS--------------
+
+If DefenseSpam = 1
+{
+	If (PlayerStats.ChatStatus!="" && PlayerStats.ChatStatus=65536)
+	{
+		If (IsInGame(hwnd))
+		{
+			If (PlayerStats.PanelWaypoint=65536 && PlayerStats.PanelInventory=65536 && PlayerStats.PanelSkillTree=65536 && PlayerStats.PanelSocial=65536)
+			{
+				IniRead, Slot1Disabled2, Config.ini, Disable2Slot, Disable2Slot1, 0
+				If (Slot1Disabled2 = 0)
+				{
+					hkey:=FlaskHotkey1
+					IfWinActive Path of Exile ahk_class Direct3DWindowClass
+					{
+						Sendinput, %hkey% Down} 
+						Sendinput, %hkey% Up}
+					}
+				}
+				IniRead, Slot2Disabled2, Config.ini, Disable2Slot, Disable2Slot2, 0
+				If (Slot2Disabled2 = 0)
+				{
+					hkey:=FlaskHotkey2
+					IfWinActive Path of Exile ahk_class Direct3DWindowClass
+					{
+						Sendinput, %hkey% Down} 
+						Sendinput, %hkey% Up}
+					}
+				}
+				IniRead, Slot3Disabled2, Config.ini, Disable2Slot, Disable2Slot3, 0
+				If (Slot3Disabled2 = 0)
+				{
+					hkey:=FlaskHotkey3
+					IfWinActive Path of Exile ahk_class Direct3DWindowClass
+					{
+						Sendinput, %hkey% Down} 
+						Sendinput, %hkey% Up}
+					}
+				}
+				IniRead, Slot4Disabled2, Config.ini, Disable2Slot, Disable2Slot4, 0
+				If (Slot4Disabled2 = 0)
+				{
+					hkey:=FlaskHotkey4
+					IfWinActive Path of Exile ahk_class Direct3DWindowClass
+					{
+						Sendinput, %hkey% Down} 
+						Sendinput, %hkey% Up}
+					}
+				}
+				IniRead, Slot5Disabled2, Config.ini, Disable2Slot, Disable2Slot5, 0
+				If (Slot5Disabled2 = 0)
+				{
+					hkey:=FlaskHotkey5
+					IfWinActive Path of Exile ahk_class Direct3DWindowClass
+					{
+						Sendinput, %hkey% Down} 
+						Sendinput, %hkey% Up}
+					}
+				}
+			}
+		}
+	}
+	DefenseSpam := 0
+}
+
+If AutoDefense = 1
+{
+	If (PlayerStats.ChatStatus!="" && PlayerStats.ChatStatus=65536)
+	{
+		If (IsInGame(hwnd))
+		{
+			IfWinActive Path of Exile ahk_class Direct3DWindowClass
+			{
+				mtoggle++
+				if ( mtoggle > 0 )
+					mtoggle := -1
+				if ( mtoggle = -1 )
+				{
+				APMode := "Manual"
+				Gui, 5:Font, cRed
+				GuiControl, 5:Font, APMode
+				}
+				if ( mtoggle = 0 )
+				{
+				APMode := "Automatic"
+				Gui, 5:Font, cGreen
+				GuiControl, 5:Font, APMode
+				}
+				GuiControl,5:, APMode, Defense Mode: %APMode%
+			}
+		}
+	}
+	AutoDefense := 0
+}
+
+If ( overlayTimer <= 0 )
+		{
+			checkOverlay := 1
+		}
+		
+If ( toggleOverlay = 1 )
+{
+	toggle++
+	if toggle > 0
+		toggle := -1
+	if toggle = -1
+	{
+		Gui, 5:Hide
+	}
+	if toggle = 0
+	{
+		Gui, 5:Show, w125 h15 NA
+	}
+	toggleOverlay := 0
+}
+
+If ( checkOverlay = 1 )
+{
+	if toggle != -1
+	{
+			IfWinActive Path of Exile ahk_class Direct3DWindowClass
+			{
+				WinGetActiveStats,name,width,height,x,y
+				;MsgBox, defaults: width:%width% height:%height% x:%x% y:%y%
+				width += x
+				width += xOffset
+				hh := y
+				hh += yOffset
+				if (toggle = 0 )
+				{
+					width /= 4.88
+					height /= 1.131
+					;MsgBox, gui5s: width:%width% height:%height% x:%x% y:%y%
+					Gui, 5:Show, w125 h15 y%height% x%width% NA
+				}
+			} 
+			Else 
+			{
+				Gui, 5:Hide
+			}
+	}
+	overlayTimer := baseOverlayTimer
+	checkOverlay := 0
+}
+
+;------- END ADDED FUNCTIONS------------------- END ADDED FUNCTIONS--------------
 
       ;--------------Debug Window Update------------------
 
@@ -3267,8 +3454,6 @@ Main()
 ;-------MAIN FUNCTIONS-----------------MAIN FUNCTIONS-----------------MAIN FUNCTIONS-----------------
 
 ;-------TEST FUNCTIONS-----------------TEST FUNCTIONS-----------------TEST FUNCTIONS-----------------
-
-
 UsePortal()
 {
    IfWinActive Path of Exile ahk_class Direct3DWindowClass
@@ -3869,8 +4054,8 @@ GuiUpdate:
 			IniWrite, %QuickSilverMovementTimer% , Config.ini, Config%A_Index%, QuickSilverMovementTimer
 			IniWrite, %RemoveAilmentsTimer% , Config.ini, Config%A_Index%, RemoveAilmentsTimer
 			IniWrite, %ResyncSpam% , Config.ini, Config%A_Index%, ResyncSpam
-         IniWrite, %RemainingSpam% , Config.ini, Config%A_Index%, RemainingSpam
-         IniWrite, %RemoveCorruptedBloodCharges% , Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges
+			IniWrite, %RemainingSpam% , Config.ini, Config%A_Index%, RemainingSpam
+			IniWrite, %RemoveCorruptedBloodCharges% , Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges
 		}
    }
 
@@ -3929,7 +4114,10 @@ AutoQuitList:
    If AutoQuitChoice = 2
    autoQuitMode:=0
    If AutoQuitChoice = 3
-   autoQuitMode:=3
+   {
+      MsgBox, This is still beta. This is only for testing.`nDont use in Harcore`nWorks Better on Bigger Resolutions`nPut the Portal Scroll on the Top-Left of your Inventory`n`nTest With [Ctrl+F4] First`n`nUse Ctrl+Alt+Del to unstuck.
+      autoQuitMode:=3
+   }
    If AutoQuitChoice = 4
    autoQuitMode:=4
    
@@ -3972,11 +4160,11 @@ ConfigList:
 			IniRead, minManaToDrinkPot , Config.ini, Config%A_Index%, minManaToDrinkPot, 15
 			IniRead, minLifePercentToSpam, Config.ini, Config%A_Index%, minLifePercentToSpam, 35
 			IniRead, ResyncSpam, Config.ini, Config%A_Index%, ResyncSpam, 0
-         IniRead, RemainingSpam, Config.ini, Config%A_Index%, RemainingSpam, 0
+			IniRead, RemainingSpam, Config.ini, Config%A_Index%, RemainingSpam, 0
 			IniRead, InstantFlaskDelay, Config.ini, Config%A_Index%, InstantFlaskDelay, 0
 			IniRead, QuickSilverMovementTimer , Config.ini, Config%A_Index%, QuickSilverMovementTimer, 15
-         IniRead, RemoveAilmentsTimer , Config.ini, Config%A_Index%, RemoveAilmentsTimer, 10
-         IniRead, RemoveCorruptedBloodCharges, Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges, 10
+			IniRead, RemoveAilmentsTimer , Config.ini, Config%A_Index%, RemoveAilmentsTimer, 10
+			IniRead, RemoveCorruptedBloodCharges, Config.ini, Config%A_Index%, RemoveCorruptedBloodCharges, 10
 			IniWrite, %A_Index%, Config.ini, Config, ConfigNumber
 		}
 	}
@@ -4369,13 +4557,24 @@ DisableSlot:
    }
 return
 
-ReadMe:
-   MsgBox, ------------------------------HOTKEYS------------------------------`n`n[F1] --- Use Resync Command`n[F2] --- Use Remaining Command`n[F3] --- Over an Item for DPSCalc`n[Ctrl+F3] --- Over an Item for More info on the Internet`n[F4] --- Test Exit to Log In Screen`n[Ctrl+F4] -- Test Use Portal`n[F10] -- Send Last Chat Message to Trade Channels 1-10`n[Alt + W] - Change Window to Bordeless, and locks mouse on window.`n[MIDDLE MOUSE] - Send Hideout command.`n`n------------------------------CREDITS------------------------------`n`n Base Script Created by Wrongusername.`n`n GUI and Improvements by Gurud.`n`n DPSCalc By Nipper`n`n----------------------------MORE INFO----------------------------`n`nFor more Info and Updates Go to:`n`n http://www.ownedcore.com/forums`n/mmo/path-of-exile/poe-bots-programs`n/451206-poe-autoflask-autoscript-improvements-updates.html`n`nThe link has been coppied to the clipboard.
-   clipboard = http://www.ownedcore.com/forums/mmo/path-of-exile/poe-bots-programs/451206-poe-autoflask-autoscript-improvements-updates.html
+Disable2Slot:
+   Gui, Submit, NoHide
+   Loop, 5
+   {
+		If Disable2Slot%A_Index% = 0
+		{
+			IniWrite, 0 , Config.ini, Disable2Slot, Disable2Slot%A_Index%
+		}
+		Else If Disable2Slot%A_Index% = 1
+		{
+			IniWrite, 1 , Config.ini, Disable2Slot, Disable2Slot%A_Index%
+		}
+   }
 return
 
-Donate:
-   Run "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=gurud.exe@gmail.com&lc=BR&item_name=MultiScript Support&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gIf:NonHosted"
+ReadMe:
+   MsgBox, ------------------------------HOTKEYS------------------------------`n`n[F1] --- Use /oos Command`n[F2] --- Use /remaining Command`n[F3] --- Over an Item for DPSCalc`n[Ctrl+F3] --- Over an Item for More info on the Internet`n[F4] --- Test Exit to Log In Screen`n[Ctrl+F4] -- Test Use Portal`n[F10] -- Send Last Chat Message to Trade Channels 1-10`n[Alt + W] --- Change Window to Bordeless, and locks mouse on window.`n[MIDDLE MOUSE] --- Send /hideout command.`n[``] --- Use all flasks not disabled in Defense tab`n[6]Autospam Defense tab flasks enable/disable`n[F6]Enable/Disable Defense overlay`n*Wild Mode means it will trigger regardless of modifier keys!`n`n------------------------------CREDITS------------------------------`n`n Base Script Created by Wrongusername.`n`n GUI and Improvements by Gurud.`n`n DPSCalc By Nipper.`n`n Offsets by Badplayer.`n`n More GUI and Improvements by Deafwave.`n`n----------------------------MORE INFO----------------------------`n`nFor more Info and Updates Go to:`n`n http://www.ownedcore.com/forums`n/mmo/path-of-exile/poe-bots-programs`n/451206-poe-autoflask-autoscript-improvements-updates.html`n`nThe link has been coppied to the clipboard.
+   clipboard = http://www.ownedcore.com/forums/mmo/path-of-exile/poe-bots-programs/451206-poe-autoflask-autoscript-improvements-updates.html
 return
 
 GuiClose:
@@ -4410,29 +4609,7 @@ DoHotkey4:
 return
 
 DoHotkey5:
-
-			If (autoQuitMode=0)
-			{
-				 QuitToLoginScreen(WinActive("A"))
-			}
-			Else If (autoQuitMode=1)
-			{
-				run, cports.exe /close * * * * PathofExile.exe
-			}
-			Else If (autoQuitMode=3)
-			{
-            WinActivate Path of Exile ahk_class Direct3DWindowClass
-				IfWinActive Path of Exile ahk_class Direct3DWindowClass
-            {
-               SendInput {ALT Down}
-               SendInput {F4}
-               SendInput {ALT Up}
-            }
-			}
-			Else If (autoQuitMode=4)
-			{
-               run, cports.exe /close * * * * PathofExile.exe
-			}
+   run, cports.exe /close * * * * PathofExile.exe
 return
 
 DoHotkey6:
@@ -4450,6 +4627,18 @@ return
 
 DoHotkey9:
    hideout:=1
+return
+
+DoHotkey10:
+	DefenseSpam:=1
+return
+
+DoHotkey11:
+	AutoDefense:=1
+return
+
+DoHotkey12:
+	toggleOverlay:=1
 return
 
 ;-------HOTKEYS-----------------HOTKEYS-----------------HOTKEYS-----------------HOTKEYS--------------
@@ -4764,8 +4953,18 @@ LoadSettings()
       {
          IniRead, val, %ININame% , Hotkeys, hk_%A_Index%_hk,mbutton
       }
-      
-      ;IniRead, val, %ININame% , Hotkeys, hk_%A_Index%_hk,
+      If A_index=10
+      {
+         IniRead, val, %ININame% , Hotkeys, hk_%A_Index%_hk,``
+      }
+	  If A_index=11
+      {
+         IniRead, val, %ININame% , Hotkeys, hk_%A_Index%_hk,6
+      }
+	  If A_index=12
+	  {
+		IniRead, val, %ININame% , Hotkeys, hk_%A_Index%_hk,F6
+	  }
       
       If (val != "ERROR")
       {
@@ -5306,14 +5505,13 @@ DPSCalc()
 
       ; Show tooltip, with fixed width font
       ToolTip, %TT%, X + 35, Y + 35
-      ;global FixedFont
-      ;SetFont(FixedFont)
+      global FixedFont
+      SetFont(FixedFont)
       ; Set up count variable and start timer for tooltip timeout
-      global ToolTipTimeout := 0
+	  global ToolTipTimeout := 0
       SetTimer, ToolTipTimer, 100
    }
 }
- 
 ; Tick every 100 ms
 ; Remove tooltip If mouse is moved or 5 seconds pass
 ToolTipTimer:
@@ -5328,5 +5526,4 @@ If (MouseMoved or ToolTipTimeout >= 50)
 return
 
 ;-------NOT MY FUNCTIONS--------------NOT MY FUNCTIONS--------------NOT MY FUNCTIONS-----------------
-
 ;-------END--------------END--------------END--------------END--------------END----------------------
