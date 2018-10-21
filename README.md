@@ -1,3 +1,5 @@
+# THIS PROJECT IS DEPRECATED
+
 # Download
 https://github.com/badplayerr/beta-autopot/releases
 
